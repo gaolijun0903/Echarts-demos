@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="height:400px"></div>
+    <!-- ECharts单文件引入 -->
+    <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+    <script type="text/javascript">
+        // 路径配置
+        require.config({
+            paths: {
+                echarts: 'http://echarts.baidu.com/build/dist'
+            }
+        });
+        
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/theme/macarons',
+                'echarts/chart/bar' // 使用柱状图就加载bar模块，按需加载
+            ],
+            function (ec,theme) {
+                // 基于准备好的dom，初始化echarts图表
+                var myChart = ec.init(document.getElementById('main'),theme); 
+
+var dataMap = {};
+function dataFormatter(obj) {
+    //var pList = ['北京','天津','河北','山西','内蒙古','辽宁','吉林','黑龙江','上海','江苏','浙江','安徽','福建','江西','山东','河南','湖北','湖南','广东','广西','海南','重庆','四川','贵州','云南','西藏','陕西','甘肃','青海','宁夏','新疆'];
+    var temp;
+    var max = 0;
+    for (var year = 0; year <= 9; year++) {
+        temp = obj[year];
+        for (var i = 0, l = temp.length; i < l; i++) {
+            max = Math.max(max, temp[i]);
+            obj[year][i] = {
+                //name : pList[i],
+                value : temp[i]
+            }
+        }
+        obj[year+'max'] = Math.floor(max/100) * 100;
+    }
+    return obj;
+}
+
+dataMap.dataGDP = dataFormatter({
+    //max : 60000,
+    0:[16251.93,11307.28,24515.76,11237.55,14359.88,22226.7,1886.35],
+    1:[14113.58,9224.46,20394.26,9200.86,11672,18457.27,8667.58],
+    2:[12153.03,7521.85,17235.48,7358.31,9740.25,15212.49,7278.75],
+    3:[11115,6719.01,16011.97,7315.4,8496.2,13668.58,6426.1],
+    4:[9846.81,5252.76,13607.32,6024.45,6423.18,11164.3,5284.69],
+    5:[4462.74,11467.6,4878.61,4944.25,9304.52,4275.12,6211.8],
+    6:[6969.52,3905.64,10012.11,4230.53,3905.03,8047.26,1886.35],
+    7:[6033.21,3110.97,8477.63,3571.37,3041.07,6672,1886.35],
+    8:[2556.02,185.09,2587.72,1399.83,390.2,445.36,1886.35],
+    9:[4315,2150.76,6018.28,2324.8,1940.94,5458.22,2348.54]
+});
+ var option;
+option = {
+    timeline:{
+        data:[
+            '0000','0100','0200','0300','0400',
+            '0500','0600','0700','0800','0900'
+        ],
+        label : {
+            formatter : function(s) {
+                console.log('s->',s);
+                return s.slice(0,2)+':00';
+            }
+        },
+        autoPlay : true,
+        playInterval : 1000
+    },
+    options:[
+        {
+            title : {
+                'text':'00:00数据',
+                'subtext':'数据来自易到用车-北京'
+            },
+            tooltip : {'trigger':'axis'},
+            legend : {
+                x:'right',
+                'data':[ ]
+            },
+            toolbox : {
+                'show':true, 
+                orient : 'vertical',
+                x: 'right', 
+                y: 'center',
+                'feature':{
+                    'mark':{'show':true},
+                    'dataView':{'show':true,'readOnly':false},
+                    'magicType':{'show':true,'type':['line','bar','stack','tiled']},
+                    'restore':{'show':true},
+                    'saveAsImage':{'show':true}
+                }
+            },
+            calculable : true,
+            grid : {'y':80,'y2':100},
+            xAxis : [{
+                'type':'category',
+                // 'axisLabel':{'interval':0},
+                'data':[
+                    '总订单量',
+                    '结束订单总费用',
+                    '结束订单总里程数',
+                    '总下单数',
+                    '总结束订单量',
+                    '总成单率',
+                    '改派量'
+                ]
+            }],
+            yAxis : [
+                {
+                    'type':'value',
+                    'name':'人民币（亿元）',
+                    'max':20000
+                }
+            ],
+            series : [
+                {
+                    'name':'订单',
+                    'type':'bar',
+                    'markLine':{
+                        symbol : ['arrow','none'],
+                        symbolSize : [4, 2],
+                        itemStyle : {
+                            normal: {
+                                lineStyle: {color:'orange'},
+                                barBorderColor:'orange',
+                                label:{
+                                    position:'left',
+                                    formatter:function(params){
+                                        return Math.round(params.value);
+                                    },
+                                    textStyle:{color:'orange'}
+                                }
+                            }
+                        },
+                        'data':[{'type':'average','name':'平均值'}]
+                    },
+                    'data': dataMap.dataGDP['0']
+                }
+            ]
+        },
+        {
+            title : {'text':'01:00数据'},
+            series : [
+                {'data': dataMap.dataGDP['1']}
+            ]
+        },
+        {
+            title : {'text':'02:00数据'},
+            series : [
+                {'data': dataMap.dataGDP['2']}
+            ]
+        },
+        {
+            title : {'text':'03:00数据'},
+            series : [
+                {'data': dataMap.dataGDP['3']}
+                
+            ]
+        },
+        {
+            title : {'text':'04:00数据'},
+            series : [
+                {'data': dataMap.dataGDP['4']}
+            ]
+        },
+        {
+            title : {'text':'05:00数据'},
+            series : [
+                {'data': dataMap.dataGDP['5']}
+            ]
+        },
+        {
+            title : {'text':'06:00数据'},
+            series : [
+                {'data': dataMap.dataGDP['6']}
+            ]
+        },
+        {
+            title : {'text':'07:00数据'},
+            series : [
+                {'data': dataMap.dataGDP['7']}
+            ]
+        },
+        {
+            title : {'text':'08:00数据'},
+            series : [
+                {'data': dataMap.dataGDP['8']}
+            ]
+        },
+        {
+            title : {'text':'09:00数据'},
+            series : [
+                {'data': dataMap.dataGDP['9']}
+            ]
+        }
+    ]
+};               
+    
+        
+                // 为echarts对象加载数据 
+                myChart.setOption(option); 
+            }
+        );
+    </script>
+</body>
